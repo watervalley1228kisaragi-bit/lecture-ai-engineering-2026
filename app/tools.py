@@ -10,6 +10,7 @@ from functools import cache
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+LEARNING_LOG_DIR = Path(__file__).resolve().parent.parent / "learning_log"
 MAX_RESULTS = 3
 
 
@@ -97,3 +98,19 @@ def make_quiz(lecture: int) -> str:
         },
         ensure_ascii=False,
     )
+
+
+def save_learning_log(filename: str, content: str) -> str:
+    """学習内容を learning_log/ フォルダに保存する。
+
+    利用者が保存してよいと確認した後に、学習の記録をファイルへ保存するときに使う。
+    filename はファイル名だけ（パス区切りを含めない）を指定する。
+    """
+    name = filename.strip()
+    if not name or Path(name).name != name or "/" in name or "\\" in name or name in {".", ".."}:
+        return "ファイル名が不正です。learning_log/ 内のファイル名を指定してください。"
+
+    LEARNING_LOG_DIR.mkdir(parents=True, exist_ok=True)
+    path = LEARNING_LOG_DIR / name
+    path.write_text(content, encoding="utf-8")
+    return f"学習記録を {path.relative_to(LEARNING_LOG_DIR.parent)} に保存しました。"
